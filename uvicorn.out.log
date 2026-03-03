@@ -1,0 +1,8 @@
+INFO:     127.0.0.1:59846 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56315 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56315 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61036 - "GET /me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:61036 - "GET /oauth/login HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:57224 - "GET /oauth/callback?code=DGGaHaIysR9LnAqAJzWaSTYZY6wxpvuGYkdoyPhYFrsK5QihOErIojDjttesKA8L&state=QScIRmxcaNDc78ICgBTgd2pIdCY0-NWsOyy6YzI0kMw HTTP/1.1" 307 Temporary Redirect
+INFO:     127.0.0.1:57224 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50461 - "GET /me HTTP/1.1" 200 OK
