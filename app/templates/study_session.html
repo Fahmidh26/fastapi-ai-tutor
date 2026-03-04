@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AI Tutor Pro - Study Session</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13a4ec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101c22",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: "Lexend", sans-serif; }
+        .latex-font { font-family: "Times New Roman", serif; font-style: italic; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100">
+<div class="flex h-screen overflow-hidden">
+<aside class="w-80 flex flex-col bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 shrink-0">
+<div class="p-6 flex flex-col h-full gap-6">
+<div class="flex items-center gap-3">
+<div class="bg-primary rounded-lg p-2 text-white">
+<span class="material-symbols-outlined block">school</span>
+</div>
+<div>
+<h1 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-none">Study Session</h1>
+<p class="text-slate-500 dark:text-slate-400 text-xs font-medium">AI Tutor Pro</p>
+</div>
+</div>
+<button class="flex items-center justify-center gap-2 w-full bg-primary hover:bg-primary/90 text-white rounded-xl py-3 px-4 font-bold transition-colors">
+<span class="material-symbols-outlined text-xl">add</span>
+<span>New Chat</span>
+</button>
+<div class="flex-1 overflow-y-auto space-y-6">
+<div>
+<p class="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">Current Session</p>
+<nav class="space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 rounded-xl bg-primary/10 text-primary font-medium" href="#">
+<span class="material-symbols-outlined">schedule</span>
+<span class="text-sm">Active Chat</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 font-medium" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="text-sm">Session Notes</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 font-medium" href="#">
+<span class="material-symbols-outlined">style</span>
+<span class="text-sm">Flashcards</span>
+</a>
+</nav>
+</div>
+<div>
+<p class="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">History</p>
+<nav class="space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800" href="#">
+<span class="material-symbols-outlined text-slate-400">functions</span>
+<span class="text-sm truncate">Linear Algebra</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800" href="#">
+<span class="material-symbols-outlined text-slate-400">terminal</span>
+<span class="text-sm truncate">Python Basics</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800" href="#">
+<span class="material-symbols-outlined text-slate-400">palette</span>
+<span class="text-sm truncate">History of Art</span>
+</a>
+</nav>
+</div>
+</div>
+<div class="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="h-10 w-10 rounded-full bg-slate-200" data-alt="Student user avatar" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAWUOy7_d1vAeInz4DW24hkCiEjat5QWeXaRnRAXcStehdtFhKWu9tXIWRhNzBkmWYfNwKH6-ZWLDzzt14jy8Uh6MqbCNjwMKTaPF1EDCQgrtF3xql6DSkqCAjA92sKm_H8bOZtkMpQDa4nW_qYl2osJzz4tySRzEE9nxKnYInrv-inEyQ-eNk8pAqKiSNT5q5qwG2Jd3193tlY5pJ3p8esrZgGgS7LPDDvN0Fpq6CGafjjAOKTH2vD39k4BAI85t-RKI8CJqkFEq4B'); background-size: cover;"></div>
+<div class="flex flex-col">
+<span class="text-sm font-bold">Alex Smith</span>
+<span class="text-xs text-slate-500">Free Tier</span>
+</div>
+</div>
+<button class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+</div>
+</aside>
+<main class="flex-1 flex flex-col bg-background-light dark:bg-background-dark overflow-hidden">
+<header class="h-20 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 shrink-0">
+<div class="flex items-center gap-4">
+<div class="relative">
+<div class="h-12 w-12 rounded-full border-2 border-primary bg-slate-100" data-alt="AI Tutor profile picture" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAV-LyYSWYfX_c8aGry7Mn5YFzNzP09R2YONhdtaKuvJ8V8IMwkBOj-MGzYXbuBThbGJbK3f3ioohxjH3OHT1NWKai9g9SPy2kpDcUF4GwmmIkOVtBUsTGmHFX1NVs8MQq_QfvZzK6Fh7_t5vHjZhx4WByMYcexw9dBjqTHmoTHyUr66ZL0NjpzzfkWa0CULB2upJ0ems_WHsSWZhgwZKuxS5LrN8At0niWBUkoZAQ3gkNNMDfxff5Ha6V_33emmxtU_uRMlgc2VaNw'); background-size: cover;"></div>
+<div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white dark:border-slate-900 rounded-full"></div>
+</div>
+<div class="flex flex-col">
+<h2 class="text-base font-bold text-slate-900 dark:text-slate-100">{{ tutor_name }}</h2>
+<p class="text-xs text-slate-500 dark:text-slate-400">Mathematics &amp; CS Expert - Active</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="p-2 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-500 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">search</span>
+</button>
+<button class="p-2 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-500 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="h-8 w-[1px] bg-slate-200 dark:bg-slate-700 mx-1"></div>
+<button class="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800">
+                        View Profile
+                    </button>
+</div>
+</header>
+<section class="flex-1 overflow-y-auto p-8 space-y-8 scroll-smooth">
+<div class="flex gap-4 max-w-4xl">
+<div class="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary">smart_toy</span>
+</div>
+<div class="flex flex-col gap-2">
+<div class="bg-white dark:bg-slate-800 rounded-2xl rounded-tl-none p-5 shadow-sm border border-slate-100 dark:border-slate-700/50">
+<p class="text-slate-800 dark:text-slate-200 leading-relaxed mb-4">
+                                Hello Alex! Let us dive back into your calculus review. Specifically, we will look at the fundamental theorem of calculus. It connects differentiation and integration in a beautiful way:
+                            </p>
+<div class="bg-slate-50 dark:bg-slate-900 rounded-lg p-4 mb-4 text-center">
+<span class="latex-font text-lg text-primary">
+                                    $$\int_{a}^{b} f(x) dx = F(b) - F(a)$$
+                                </span>
+</div>
+<p class="text-slate-800 dark:text-slate-200 leading-relaxed">
+                                To see how this looks in practice, we can implement a simple numeric integrator in Python using the trapezoidal rule. Check this out:
+                            </p>
+<div class="mt-4 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700">
+<div class="bg-slate-100 dark:bg-slate-900 px-4 py-2 flex items-center justify-between">
+<span class="text-xs font-mono text-slate-500 uppercase tracking-widest">python</span>
+<span class="material-symbols-outlined text-sm text-slate-400 cursor-pointer hover:text-primary">content_copy</span>
+</div>
+<pre class="p-4 bg-slate-950 text-emerald-400 font-mono text-sm overflow-x-auto"><code>def trapezoidal_rule(f, a, b, n):
+    h = (b - a) / n
+    s = (f(a) + f(b)) / 2.0
+    for i in range(1, n):
+        s += f(a + i * h)
+    return s * h</code></pre>
+</div>
+</div>
+<span class="text-[10px] text-slate-400 font-medium ml-1">AI TUTOR - 10:15 AM</span>
+</div>
+</div>
+<div class="flex gap-4 max-w-4xl ml-auto flex-row-reverse">
+<div class="h-10 w-10 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-slate-500">person</span>
+</div>
+<div class="flex flex-col gap-2 items-end">
+<div class="bg-primary text-white rounded-2xl rounded-tr-none p-5 shadow-sm">
+<p class="leading-relaxed">
+                                This makes so much sense now! The Python code helps me visualize the slices of the area. Could you explain how the error term scales as we increase <span class="latex-font">n</span>?
+                            </p>
+</div>
+<span class="text-[10px] text-slate-400 font-medium mr-1">YOU - 10:17 AM</span>
+</div>
+</div>
+<div class="flex gap-4 max-w-4xl">
+<div class="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary">smart_toy</span>
+</div>
+<div class="bg-white dark:bg-slate-800 rounded-2xl rounded-tl-none px-6 py-4 flex items-center gap-1 shadow-sm border border-slate-100 dark:border-slate-700/50">
+<div class="w-1.5 h-1.5 bg-slate-300 dark:bg-slate-600 rounded-full animate-bounce"></div>
+<div class="w-1.5 h-1.5 bg-slate-300 dark:bg-slate-600 rounded-full animate-bounce [animation-delay:0.2s]"></div>
+<div class="w-1.5 h-1.5 bg-slate-300 dark:bg-slate-600 rounded-full animate-bounce [animation-delay:0.4s]"></div>
+</div>
+</div>
+</section>
+<footer class="p-6 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 shrink-0">
+<div class="max-w-4xl mx-auto flex items-end gap-3">
+<div class="flex items-center gap-1 mb-1">
+<button class="p-2 text-slate-400 hover:text-primary transition-colors" title="Upload File">
+<span class="material-symbols-outlined">attach_file</span>
+</button>
+<button class="p-2 text-slate-400 hover:text-primary transition-colors" title="Voice Input">
+<span class="material-symbols-outlined">mic</span>
+</button>
+</div>
+<div class="flex-1 relative">
+<textarea class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl px-5 py-3 pr-12 focus:ring-2 focus:ring-primary/50 text-slate-800 dark:text-slate-200 resize-none min-h-[48px] max-h-32" placeholder="Ask about formulas, code, or upload a problem image..." rows="1"></textarea>
+<button class="absolute right-2 bottom-1.5 p-2 bg-primary text-white rounded-lg hover:shadow-lg transition-all flex items-center justify-center">
+<span class="material-symbols-outlined text-xl">send</span>
+</button>
+</div>
+<div class="mb-1">
+<button class="p-2 text-slate-400 hover:text-primary transition-colors" title="Format LaTeX">
+<span class="material-symbols-outlined">format_shapes</span>
+</button>
+</div>
+</div>
+<div class="max-w-4xl mx-auto mt-2 px-14">
+<p class="text-[10px] text-slate-400 text-center">AI Tutor Pro can make mistakes. Check important information.</p>
+</div>
+</footer>
+</main>
+<aside class="w-12 flex flex-col items-center py-6 bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 shrink-0">
+<div class="space-y-6">
+<button class="p-2 text-primary bg-primary/10 rounded-lg">
+<span class="material-symbols-outlined">lightbulb</span>
+</button>
+<button class="p-2 text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">edit_note</span>
+</button>
+<button class="p-2 text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">quiz</span>
+</button>
+<button class="p-2 text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">history_edu</span>
+</button>
+</div>
+</aside>
+</div>
+</body>
+</html>

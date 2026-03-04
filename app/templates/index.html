@@ -1,168 +1,327 @@
-<!doctype html>
-<html class="dark" lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard - FastAPI OAuth Client</title>
-  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@300;400;700&display=swap" rel="stylesheet" />
-  <script>
-    tailwind.config = {
-      darkMode: "class",
-      theme: {
-        extend: {
-          colors: {
-            primary: "#13a4ec",
-            secondary: "#8b5cf6",
-            "background-dark": "#0a0a0c",
-            "surface-dark": "#161b22"
-          },
-          fontFamily: {
-            display: ["Inter", "sans-serif"]
-          }
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13a4ec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101c22",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                },
+            },
         }
-      }
-    };
-  </script>
-  <style>
-    body { font-family: Inter, sans-serif; }
-    .glass {
-      background: rgba(22, 27, 34, 0.72);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-    .material-symbols-outlined {
-      font-variation-settings: 'FILL' 0, 'wght' 450, 'GRAD' 0, 'opsz' 24;
-    }
-  </style>
+    </script>
+<title>AI Tutor Gallery</title>
 </head>
-<body class="bg-background-dark text-slate-100 antialiased">
-  <div class="min-h-screen flex">
-    <aside class="hidden lg:flex w-72 glass border-r border-white/5 flex-col fixed h-screen z-30">
-      <div class="p-5 flex items-center gap-3 border-b border-white/5">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
-          <span class="material-symbols-outlined">bolt</span>
-        </div>
-        <div>
-          <h1 class="text-lg font-bold">FastAPI Client</h1>
-          <p class="text-[11px] text-primary uppercase tracking-widest">OAuth Dashboard</p>
-        </div>
-      </div>
-
-      <nav class="p-3 space-y-1 flex-1">
-        <a href="/" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary/15 text-primary border border-primary/30">
-          <span class="material-symbols-outlined">dashboard</span>
-          <span class="text-sm font-semibold">Dashboard</span>
-        </a>
-        <a href="/me" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-white/5 hover:text-white transition-colors">
-          <span class="material-symbols-outlined">person</span>
-          <span class="text-sm font-medium">My Session</span>
-        </a>
-        <a href="{{ oauth_base }}" target="_blank" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-300 hover:bg-white/5 hover:text-white transition-colors">
-          <span class="material-symbols-outlined">open_in_new</span>
-          <span class="text-sm font-medium">OAuth Provider</span>
-        </a>
-      </nav>
-
-      <div class="p-5 border-t border-white/5">
-        <a href="/oauth/login" class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-primary hover:bg-primary/90 rounded-xl text-white font-bold transition-colors">
-          <span class="material-symbols-outlined text-base">login</span>
-          Login with Main Site
-        </a>
-      </div>
-    </aside>
-
-    <main class="flex-1 lg:ml-72">
-      <header class="h-16 glass border-b border-white/5 px-4 sm:px-6 lg:px-10 flex items-center justify-between">
-        <h2 class="text-sm sm:text-base font-semibold text-slate-200">OAuth Client Dashboard</h2>
-        <div class="flex items-center gap-2">
-          <a href="/me" class="px-3 py-2 text-xs sm:text-sm rounded-lg bg-white/5 hover:bg-white/10">/me</a>
-          <a href="/logout" class="px-3 py-2 text-xs sm:text-sm rounded-lg bg-red-500/10 text-red-300 hover:bg-red-500/20">Logout</a>
-        </div>
-      </header>
-
-      <div class="p-4 sm:p-6 lg:p-10 space-y-6">
-        <section class="relative rounded-3xl overflow-hidden p-8 sm:p-10 glass">
-          <div class="absolute inset-0 bg-gradient-to-r from-primary/20 via-secondary/10 to-transparent"></div>
-          <div class="relative z-10 max-w-3xl">
-            <h3 class="text-3xl sm:text-4xl font-black tracking-tight mb-3">
-              Welcome back,
-              <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
-                {% if user %}{{ user.get('name', 'User') }}{% else %}Guest{% endif %}
-              </span>
-            </h3>
-            <p class="text-slate-300 text-sm sm:text-base">Same dashboard vibe as your reference project, adapted for your FastAPI OAuth flow.</p>
-          </div>
-        </section>
-
-        <section class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-          <div class="glass rounded-2xl p-5 border border-primary/30">
-            <p class="text-[11px] uppercase tracking-widest text-slate-400 font-semibold">Auth Status</p>
-            <p class="mt-2 text-2xl font-black {% if user %}text-emerald-300{% else %}text-amber-300{% endif %}">
-              {% if user %}Connected{% else %}Not Connected{% endif %}
-            </p>
-          </div>
-          <div class="glass rounded-2xl p-5 border border-white/10">
-            <p class="text-[11px] uppercase tracking-widest text-slate-400 font-semibold">Provider Base</p>
-            <p class="mt-2 text-sm text-white break-all">{{ oauth_base }}</p>
-          </div>
-          <div class="glass rounded-2xl p-5 border border-white/10">
-            <p class="text-[11px] uppercase tracking-widest text-slate-400 font-semibold">Redirect URI</p>
-            <p class="mt-2 text-sm text-white break-all">{{ redirect_uri }}</p>
-          </div>
-          <div class="glass rounded-2xl p-5 border border-white/10">
-            <p class="text-[11px] uppercase tracking-widest text-slate-400 font-semibold">Token Preview</p>
-            <p class="mt-2 text-xs text-slate-200 break-all">{{ access_token[:20] + '...' if access_token else 'No token' }}</p>
-          </div>
-        </section>
-
-        <section class="grid grid-cols-1 xl:grid-cols-3 gap-6">
-          <div class="xl:col-span-2 glass rounded-2xl p-6 border border-white/10">
-            <div class="flex items-center justify-between gap-3 mb-4">
-              <h4 class="text-lg font-bold">Quick Actions</h4>
-              <span class="text-[10px] uppercase tracking-widest text-slate-500">OAuth</span>
-            </div>
-            <div class="flex flex-wrap gap-3">
-              <a href="/oauth/login" class="px-4 py-2.5 rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold inline-flex items-center gap-2 transition-colors">
-                <span class="material-symbols-outlined text-base">login</span>
-                Login with Main Site
-              </a>
-              <a href="/me" class="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 inline-flex items-center gap-2 transition-colors">
-                <span class="material-symbols-outlined text-base">data_object</span>
-                View Session JSON
-              </a>
-              <a href="/logout" class="px-4 py-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-300 border border-red-400/20 inline-flex items-center gap-2 transition-colors">
-                <span class="material-symbols-outlined text-base">logout</span>
-                Logout
-              </a>
-            </div>
-          </div>
-
-          <div class="glass rounded-2xl p-6 border border-white/10">
-            <h4 class="text-lg font-bold mb-3">Session User</h4>
-            {% if user %}
-              <p class="text-sm text-slate-300 mb-2"><span class="text-slate-500">Name:</span> {{ user.get('name', 'N/A') }}</p>
-              <p class="text-sm text-slate-300 break-all"><span class="text-slate-500">Email:</span> {{ user.get('email', 'N/A') }}</p>
-            {% else %}
-              <p class="text-sm text-slate-400">No authenticated user in session.</p>
-            {% endif %}
-          </div>
-        </section>
-
-        <section class="glass rounded-2xl p-6 border border-white/10">
-          <h4 class="text-lg font-bold mb-4">Raw Session Data</h4>
-          {% if user %}
-            <pre class="text-xs text-slate-200 bg-black/30 rounded-xl p-4 overflow-auto border border-white/10">{{ user | tojson(indent=2) }}</pre>
-          {% else %}
-            <div class="rounded-xl border border-dashed border-white/15 p-6 text-sm text-slate-400">
-              Authenticate first to view provider user data and access token details.
-            </div>
-          {% endif %}
-        </section>
-      </div>
-    </main>
-  </div>
-</body>
-</html>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100">
+<div class="relative flex min-h-screen flex-col">
+<!-- Top Navigation Bar -->
+<header class="sticky top-0 z-50 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark px-6 py-3 lg:px-10">
+<div class="flex items-center gap-4">
+<div class="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-white">
+<span class="material-symbols-outlined">auto_stories</span>
+</div>
+<h2 class="text-xl font-bold leading-tight tracking-tight">AI Tutor Gallery</h2>
+</div>
+<div class="flex flex-1 justify-end gap-4 items-center">
+<div class="hidden md:flex w-full max-w-md items-center rounded-xl bg-slate-100 dark:bg-slate-800 px-4 py-2">
+<span class="material-symbols-outlined text-slate-500">search</span>
+<input class="w-full border-none bg-transparent focus:ring-0 text-sm" placeholder="Search for subjects, tutors, or topics..." type="text"/>
+</div>
+<div class="flex gap-2">
+<button class="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+</button>
+<button class="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+<span class="material-symbols-outlined text-[20px]">account_circle</span>
+</button>
+<div class="h-10 w-10 rounded-full bg-primary/20 border-2 border-primary overflow-hidden">
+<img class="h-full w-full object-cover" data-alt="User profile avatar portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBjI-2-UTqHlQQZNM6NMY3aQRn66yEslojnlf8MlsBjWkwgbL4Bbm_JFMUkcopSZ_6mUYhbx1DIXg3puje-2tQBFmquKOeqE002e1m-F4XIi6ge3XNOWA64DAyMA_Sp1FpPHEVvQ_Cacap-2C-3QQ4XKjCsuTrPI_Rl4WEjKNahSZJaj6O-f8cbe7gnPFTuN_O1yZg7jmG7PG0g1Pyg278ch7zG1uaJXes9goE2nPY_S1WzgvdL8B55aPo0gCpbQttA4m7NiXDQN5Hf"/>
+</div>
+</div>
+</div>
+</header>
+<div class="flex flex-1 flex-col lg:flex-row">
+<!-- Sidebar Filters -->
+<aside class="w-full border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark lg:w-72">
+<div class="flex flex-col gap-6 p-6">
+<div>
+<h3 class="mb-4 text-sm font-semibold uppercase tracking-wider text-slate-500">Subject</h3>
+<nav class="flex flex-col gap-1">
+<button class="flex items-center gap-3 rounded-xl bg-primary/10 px-3 py-2 text-primary">
+<span class="material-symbols-outlined text-[20px]">apps</span>
+<span class="text-sm font-medium">All Subjects</span>
+</button>
+<button class="flex items-center gap-3 rounded-xl px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800">
+<span class="material-symbols-outlined text-[20px]">functions</span>
+<span class="text-sm font-medium">Math</span>
+</button>
+<button class="flex items-center gap-3 rounded-xl px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800">
+<span class="material-symbols-outlined text-[20px]">biotech</span>
+<span class="text-sm font-medium">Science</span>
+</button>
+<button class="flex items-center gap-3 rounded-xl px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800">
+<span class="material-symbols-outlined text-[20px]">history_edu</span>
+<span class="text-sm font-medium">Humanities</span>
+</button>
+<button class="flex items-center gap-3 rounded-xl px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800">
+<span class="material-symbols-outlined text-[20px]">terminal</span>
+<span class="text-sm font-medium">Coding</span>
+</button>
+</nav>
+</div>
+<div>
+<h3 class="mb-4 text-sm font-semibold uppercase tracking-wider text-slate-500">Personality</h3>
+<div class="flex flex-col gap-2">
+<label class="flex items-center gap-3 cursor-pointer">
+<input checked="" class="h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary" type="checkbox"/>
+<span class="text-sm">Socratic</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer">
+<input class="h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary" type="checkbox"/>
+<span class="text-sm">Direct</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer">
+<input class="h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary" type="checkbox"/>
+<span class="text-sm">Supportive</span>
+</label>
+</div>
+</div>
+<div>
+<h3 class="mb-4 text-sm font-semibold uppercase tracking-wider text-slate-500">Level</h3>
+<div class="grid grid-cols-2 gap-2">
+<button class="rounded-lg border border-slate-200 dark:border-slate-700 py-2 text-xs font-medium hover:border-primary hover:text-primary transition-colors">Beginner</button>
+<button class="rounded-lg border border-primary bg-primary/5 py-2 text-xs font-medium text-primary transition-colors">Advanced</button>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content: Tutor Gallery Grid -->
+<main class="flex-1 p-6 lg:p-10">
+<div class="mb-8 flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
+<div>
+<h1 class="text-2xl font-bold">Recommended Tutors</h1>
+<p class="text-slate-500 dark:text-slate-400">Discover AI companions tailored to your learning style.</p>
+</div>
+<div class="flex items-center gap-2 overflow-x-auto pb-2 lg:pb-0">
+<span class="text-xs font-bold uppercase text-slate-400 whitespace-nowrap">Sort By:</span>
+<select class="rounded-lg border-none bg-white dark:bg-slate-800 text-sm font-medium focus:ring-2 focus:ring-primary py-1.5 pl-3 pr-8 shadow-sm">
+<option>Most Popular</option>
+<option>Highest Rated</option>
+<option>Newest</option>
+</select>
+</div>
+</div>
+<!-- Grid -->
+<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+<!-- Card 1 -->
+<div class="group flex flex-col overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition-all hover:shadow-xl hover:shadow-primary/5">
+<div class="relative h-48 w-full overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+<img class="h-full w-full object-cover transition-transform group-hover:scale-105" data-alt="Futuristic blue neon abstract background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAf_xIn22TNfUVt1cfBTeaGU_I59XiTLapdR42rAJfoI6412jY7vouf8TPjtEvVgGhuf8Cf5JNB8ry3eL3iuV4bmHf7isNJYDU2eVuQCXvoZ5TGxAw-KNZdvc7Y8umsa99orrmdiuGQDhk7AvF5e8ZQPh2KggYU6Hqv9Byc68D8xSw2FSHf7lYlwg5N4DVky2AQEJ89QHZ_nNsWiP7KQBeHwnx1AZ1E6cSG3ALCaXqxMtz9L8UWU30OuaxhtBUo4gbuG0DCqWheTx-F"/>
+<div class="absolute bottom-4 left-4 flex items-center gap-3">
+<div class="h-14 w-14 rounded-full border-2 border-white bg-slate-200 overflow-hidden shadow-lg">
+<img class="h-full w-full object-cover" data-alt="Portrait of AI Tutor Nova" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJQ4OV9HG-7sYwci7W2vJjx6diB2C078nKAMLdPGCMslErNrZab_XXCSKNY5sSZ7JTMU2loRru4EWNFG1Ok8H88HdnAW6mIRZGsiE1w_ejpuS3nYY-3ndsaIPgGj5pnzsZPj7cqVlWd9jzFeS_MXgV2tW5saD8yzy6AvhgRInBgvKy_xRATEBOV-zVe2_7n4p_Bsrd1kYlCaFyeugwtQSs2jgP28mZpT7pm0N-jhPXE3Sll8zWL9DCJjOOkOPrP00pdEArpNoN7XQp"/>
+</div>
+<div class="text-white">
+<h3 class="font-bold">Nova</h3>
+<p class="text-xs opacity-90">Science Expert</p>
+</div>
+</div>
+</div>
+<div class="flex flex-1 flex-col p-5">
+<div class="mb-3 flex items-center gap-2">
+<span class="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">Advanced</span>
+<span class="rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-500">Socratic</span>
+</div>
+<p class="mb-6 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                                Specializes in quantum physics and calculus. Nova uses investigative questioning to help you grasp complex theories.
+                            </p>
+<div class="mt-auto flex items-center justify-between border-t border-slate-100 dark:border-slate-800 pt-4">
+<div class="flex items-center gap-1 text-primary">
+<span class="material-symbols-outlined text-[18px] fill-primary">star</span>
+<span class="text-sm font-bold">4.9</span>
+</div>
+<a class="rounded-lg bg-primary px-4 py-2 text-xs font-bold text-white hover:bg-primary/90" href="/study?tutor=Nova">Start Learning</a>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="group flex flex-col overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition-all hover:shadow-xl hover:shadow-primary/5">
+<div class="relative h-48 w-full overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+<img class="h-full w-full object-cover transition-transform group-hover:scale-105" data-alt="Green matrix digital code background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA6RJMOIafl8pFaAutdCmjPI0oCnwDybUsIsLxhsu91stZ5DtBlRA54hfubokUql04JJRXOJwAooTz3aNCSRXfrU3PRvCpWnRf01keJBV1KP2qhufIvZlJZD7l2Bql8hwjVXrvDTh5__h2f-kmJcrCPjlLl_1x5cO6KfWEaWIVkr8EXtYCt1YlP6C5aRYGW__1cL-Zxr7l05IK26MOJl6sTmdGzgX-pkXUJPP4nl2WuyfEeuaQk1l19SrQ5a2dD7iBzfiQ3YbfngnsG"/>
+<div class="absolute bottom-4 left-4 flex items-center gap-3">
+<div class="h-14 w-14 rounded-full border-2 border-white bg-slate-200 overflow-hidden shadow-lg">
+<img class="h-full w-full object-cover" data-alt="Portrait of AI Tutor Codex" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC0T8G83V2wAa1TCXJMlPPo2CO_OlVNcPmxOxsvZIxigppJNPod8ONdav-hE1QVQ9ryetF5i5dp4mxX79UHpJukn4CMLsW1fyDtG6gqwAVJrbhxAyXHlUWC0DyCerp33WNB9b1x9nJjTf1nceZ7vCMBafu_R0xJNvjTmcM02QATMK0NvaIhlgPFlmA77gHYpu2hC1dVD0NejNAN-R_G45tpt_KkSDfS-SwOHCJe3tMeagt2Tk8j0YsjKlMuwrzKyxepr4kPsfinXoLk"/>
+</div>
+<div class="text-white">
+<h3 class="font-bold">Codex</h3>
+<p class="text-xs opacity-90">Coding Specialist</p>
+</div>
+</div>
+</div>
+<div class="flex flex-1 flex-col p-5">
+<div class="mb-3 flex items-center gap-2">
+<span class="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">Beginner</span>
+<span class="rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-500">Direct</span>
+</div>
+<p class="mb-6 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                                Expert in Python and Web Development. Codex provides efficient code reviews and builds projects alongside you.
+                            </p>
+<div class="mt-auto flex items-center justify-between border-t border-slate-100 dark:border-slate-800 pt-4">
+<div class="flex items-center gap-1 text-primary">
+<span class="material-symbols-outlined text-[18px] fill-primary">star</span>
+<span class="text-sm font-bold">5.0</span>
+</div>
+<a class="rounded-lg bg-primary px-4 py-2 text-xs font-bold text-white hover:bg-primary/90" href="/study?tutor=Codex">Start Learning</a>
+</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="group flex flex-col overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition-all hover:shadow-xl hover:shadow-primary/5">
+<div class="relative h-48 w-full overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+<img class="h-full w-full object-cover transition-transform group-hover:scale-105" data-alt="Warm library with stacks of books background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDRJJLpQS6anFwdFBkF9QvLr79eHIauBnxmjgEQ0Uk-8GVVKrQ_8y0KbHtl0jPoxcnWSMWrcY5ed5r5u6VbTKSCO1RdOI5jy_mqa3-qp6JkJzFFDmRubsp_vRP4OJWVOdpn071mxSghQKr7nbOPLxvWxDj6vTRIIfPw4D2nnCx3CxLtEt2Hh3bltxLUi2DJyAaEP0IhgKzgRIv4QrcEOKrib18tyVZN02xCtQUD0xTRxE75jhth3dgD8jR8SXriPvhlybgqB92QRsYk"/>
+<div class="absolute bottom-4 left-4 flex items-center gap-3">
+<div class="h-14 w-14 rounded-full border-2 border-white bg-slate-200 overflow-hidden shadow-lg">
+<img class="h-full w-full object-cover" data-alt="Portrait of AI Tutor Minerva" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCkaQHTwQoHHaCkkWXDXQhM2bsJY6CvTnw6iTdn_YW1eSPstkvzJryk_xB3XC4HPyw4Kg66o4bMg5OaFTlO1LhEFUWLI2p7IeztJk2HzuZ5xpS7FGprmoCWjyQYLMpoSGbugX2p7EpUVj2oniViHVikm6LORifKDTLUpwTwv41_XrWHlAT3pxqazQtD_MAGXkdiJRZCnx1eK68Xv-OzX2byeX5kJaTRtejxkUe7VYF-t0wX7VDdrTA1ZcUDOsTkf3ZY0Cey3bNf1Ugt"/>
+</div>
+<div class="text-white">
+<h3 class="font-bold">Minerva</h3>
+<p class="text-xs opacity-90">Humanities Professor</p>
+</div>
+</div>
+</div>
+<div class="flex flex-1 flex-col p-5">
+<div class="mb-3 flex items-center gap-2">
+<span class="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">Advanced</span>
+<span class="rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-500">Supportive</span>
+</div>
+<p class="mb-6 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                                Specializes in classical literature and world history. Minerva offers thoughtful critiques and historical context.
+                            </p>
+<div class="mt-auto flex items-center justify-between border-t border-slate-100 dark:border-slate-800 pt-4">
+<div class="flex items-center gap-1 text-primary">
+<span class="material-symbols-outlined text-[18px] fill-primary">star</span>
+<span class="text-sm font-bold">4.8</span>
+</div>
+<a class="rounded-lg bg-primary px-4 py-2 text-xs font-bold text-white hover:bg-primary/90" href="/study?tutor=Minerva">Start Learning</a>
+</div>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="group flex flex-col overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition-all hover:shadow-xl hover:shadow-primary/5">
+<div class="relative h-48 w-full overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+<img class="h-full w-full object-cover transition-transform group-hover:scale-105" data-alt="Abstract white and grey geometric architecture background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDfwUfiRYPVd4L-aPYAzoN7n_9dCWPJS5d15QKxlTTe20bjgcgFQFT6a7CbqvK5Ob8uw9C8CEA52WV9MdJFHLHeOPxoYN21AcdjPeLiCi75DfJH-djAf69fDbowB1-a_uIV1OwvTBnKxw9G46LQ5wj15ir9RlwSni3_NRtrnfud2n4YCnZkWBfAuwvzmqTuNOf4tBKVVjRyU4dztZdFGZxWf94UFp6t-Ih_0FIvXWiAMP5Kyug5JHNVXwVuURHu611Z2F3c4QSAmGa8"/>
+<div class="absolute bottom-4 left-4 flex items-center gap-3">
+<div class="h-14 w-14 rounded-full border-2 border-white bg-slate-200 overflow-hidden shadow-lg">
+<img class="h-full w-full object-cover" data-alt="Portrait of AI Tutor Newton" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA9OmsO4qsGIOgT7vdMw3hxTrcUd3BjE5dYzvvdRXjZQyBI5KHGVQP1VGkPC7tr4oxrch3ptoHMoa5grBsYcqvL7a3fIXPUoQdR2nahYZE6FJk_4zIKkVCAVZ0Z7J1LFAIXX_rzCRuEMEKwwxeVXCAlFFNqmIzK04LHTDfA8HKIbam47ijpMTeKdgNdu68oZdA1MXDHUjHczXYQAssv87ttQHrdYHpAKcGSONjxcFwyazfM_tlCHWDPQPdaHrpuf6CDe2zgRFR-Gew1"/>
+</div>
+<div class="text-white">
+<h3 class="font-bold">Newton</h3>
+<p class="text-xs opacity-90">Mathematics Genius</p>
+</div>
+</div>
+</div>
+<div class="flex flex-1 flex-col p-5">
+<div class="mb-3 flex items-center gap-2">
+<span class="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">Beginner</span>
+<span class="rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-500">Socratic</span>
+</div>
+<p class="mb-6 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                                Makes algebra and geometry intuitive. Newton focuses on 'why' formulas work, not just 'how' to use them.
+                            </p>
+<div class="mt-auto flex items-center justify-between border-t border-slate-100 dark:border-slate-800 pt-4">
+<div class="flex items-center gap-1 text-primary">
+<span class="material-symbols-outlined text-[18px] fill-primary">star</span>
+<span class="text-sm font-bold">4.7</span>
+</div>
+<a class="rounded-lg bg-primary px-4 py-2 text-xs font-bold text-white hover:bg-primary/90" href="/study?tutor=Newton">Start Learning</a>
+</div>
+</div>
+</div>
+<!-- Card 5 -->
+<div class="group flex flex-col overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition-all hover:shadow-xl hover:shadow-primary/5">
+<div class="relative h-48 w-full overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+<img class="h-full w-full object-cover transition-transform group-hover:scale-105" data-alt="Satellite view of Earth at night background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCsuusn4-EXXNpqqMDr4qbLRhfv2YlHsI-dZbD6msiZw6dorezCXYvERLzDhriBL2QusVGaMjEHTAEHemw5ud3syHi_CFY7OM-mJVR4SpbkTc4c7o6nRwQRmSse7V9vQz9exaOtEqd8HKuawberDVpgOwFlqK95FUdrXbwC0aBJ1gPioHUUuunn-e385m0EEViXjJEkvvpaEXFOzPHUNojgRsdjS-3LT0NrknEg2VNZogK3CCVOMokLUzxEaBxf-DuLh0tLIB3CLphP"/>
+<div class="absolute bottom-4 left-4 flex items-center gap-3">
+<div class="h-14 w-14 rounded-full border-2 border-white bg-slate-200 overflow-hidden shadow-lg">
+<img class="h-full w-full object-cover" data-alt="Portrait of AI Tutor Curie" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD632XRLe8GOE_NE8t-2pC_vUigxxHm3IfmKafVnMiF68wlsT2qOjQ7w8tckh48B4JpUYZV58ZSw-ieqeuxqcmsH-x3B0e5cY9lfl1LVDBYIrLbsIhRk57aB1gZxnjS4CBPtBjcjASNRfqYXeVaw00ovPYRQ2-cokjlH7XzSChKXlZKiPdAik3ZqKzvC-AqJKQPo1FBN6RAv7_pK31NoOw2Rf1z5z2pcuFjB0esFfmtYo6mm3UvziKIRQvAkzWl-jS5qVPYLRNwi3MG"/>
+</div>
+<div class="text-white">
+<h3 class="font-bold">Curie</h3>
+<p class="text-xs opacity-90">Chemistry Specialist</p>
+</div>
+</div>
+</div>
+<div class="flex flex-1 flex-col p-5">
+<div class="mb-3 flex items-center gap-2">
+<span class="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">Advanced</span>
+<span class="rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-500">Direct</span>
+</div>
+<p class="mb-6 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                                Deep expertise in organic chemistry and molecular biology. Curie provides rapid feedback on complex equations.
+                            </p>
+<div class="mt-auto flex items-center justify-between border-t border-slate-100 dark:border-slate-800 pt-4">
+<div class="flex items-center gap-1 text-primary">
+<span class="material-symbols-outlined text-[18px] fill-primary">star</span>
+<span class="text-sm font-bold">4.9</span>
+</div>
+<a class="rounded-lg bg-primary px-4 py-2 text-xs font-bold text-white hover:bg-primary/90" href="/study?tutor=Curie">Start Learning</a>
+</div>
+</div>
+</div>
+<!-- Card 6 -->
+<div class="group flex flex-col overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition-all hover:shadow-xl hover:shadow-primary/5">
+<div class="relative h-48 w-full overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+<img class="h-full w-full object-cover transition-transform group-hover:scale-105" data-alt="Soft pink and yellow sunrise gradient background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB6DGoEPWupxf4PPkXVix_PU0cAlIOdI-cH0bBwnf6Gv67nj7Vfd6zjTHlQWcsLj8e7eVh6MBo51M2gSNoqZp_KEpG-sfl7iPFmNzUEB5KwawUohMqjVLNb-Qj2ttpPGBLcp4-wlNxE2hJpPnZmsZWzoYFsMyC9rzCEEwAg9K4TikKCKWpN1ZVJla4NyzUXwU4oEzh4_cwVxTEXdBqNgIR7hDjaNZY-Wqeume_HDtCWMxTiQSW21bd1aY6wRkdOBRYP80wOrg1CVYvK"/>
+<div class="absolute bottom-4 left-4 flex items-center gap-3">
+<div class="h-14 w-14 rounded-full border-2 border-white bg-slate-200 overflow-hidden shadow-lg">
+<img class="h-full w-full object-cover" data-alt="Portrait of AI Tutor Lyra" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGswrkXKOMwwE3lPqocK6HSB-ct7WbXxSsSND_38XWYK5hl1llzpK_PEFc4hrjiBdqlBB5Lc6jBAm8rcf0rC5PpQjUTVupa2psMV8kgxBt8-eZu52ACwjm-4KizvrFCng8Ah9urnYfV8ul312zVnMaJlWLtzWEHgXxi7KpRD31RmbJ3sreZOUeTjihE5zyFGFfS4yQ9BKE7COjqYgpjaeAjESYVOnyZrBI4so-M3KG1-f6ueWmuXYggqgQITf6z5bdQOZeA3U5s7dU"/>
+</div>
+<div class="text-white">
+<h3 class="font-bold">Lyra</h3>
+<p class="text-xs opacity-90">Language Mentor</p>
+</div>
+</div>
+</div>
+<div class="flex flex-1 flex-col p-5">
+<div class="mb-3 flex items-center gap-2">
+<span class="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">Beginner</span>
+<span class="rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-500">Supportive</span>
+</div>
+<p class="mb-6 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                                Patience-driven language acquisition. Lyra helps you master new tongues through conversation and cultural context.
+                            </p>
+<div class="mt-auto flex items-center justify-between border-t border-slate-100 dark:border-slate-800 pt-4">
+<div class="flex items-center gap-1 text-primary">
+<span class="material-symbols-outlined text-[18px] fill-primary">star</span>
+<span class="text-sm font-bold">4.6</span>
+</div>
+<a class="rounded-lg bg-primary px-4 py-2 text-xs font-bold text-white hover:bg-primary/90" href="/study?tutor=Lyra">Start Learning</a>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</div>
+</body></html>

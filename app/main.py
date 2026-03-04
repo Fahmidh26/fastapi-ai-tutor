@@ -3,7 +3,7 @@ from __future__ import annotations
 import os
 import secrets
 from pathlib import Path
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urlsplit
 
 import httpx
 from dotenv import load_dotenv
@@ -31,6 +31,26 @@ OAUTH_INTERNAL_URL = os.getenv('AISITE_OAUTH_INTERNAL_URL', OAUTH_BASE_URL).rstr
 OAUTH_CLIENT_ID = os.getenv('AISITE_OAUTH_CLIENT_ID', '')
 OAUTH_CLIENT_SECRET = os.getenv('AISITE_OAUTH_CLIENT_SECRET', '')
 OAUTH_REDIRECT_URI = os.getenv('AISITE_OAUTH_REDIRECT_URI', 'http://localhost:8002/oauth/callback')
+_redirect_target = urlsplit(OAUTH_REDIRECT_URI)
+CANONICAL_HOST = _redirect_target.hostname
+CANONICAL_PORT = _redirect_target.port
+CANONICAL_SCHEME = _redirect_target.scheme or 'http'
+
+
+@app.middleware('http')
+async def enforce_canonical_host(request: Request, call_next):
+    request_host = request.url.hostname
+    if CANONICAL_HOST and request_host and request_host != CANONICAL_HOST:
+        scheme = CANONICAL_SCHEME
+        if CANONICAL_PORT:
+            netloc = f'{CANONICAL_HOST}:{CANONICAL_PORT}'
+        else:
+            netloc = CANONICAL_HOST
+
+        canonical_url = str(request.url.replace(scheme=scheme, netloc=netloc))
+        return RedirectResponse(url=canonical_url, status_code=307)
+
+    return await call_next(request)
 
 
 @app.get('/')
@@ -45,6 +65,47 @@ async def home(request: Request):
             'redirect_uri': OAUTH_REDIRECT_URI,
         },
     )
+
+
+@app.get('/dashboard-auth')
+async def dashboard_auth(request: Request):
+    return templates.TemplateResponse(
+        request,
+        'dashboard_auth.html',
+        {
+            'user': request.session.get('user'),
+            'access_token': request.session.get('access_token'),
+            'oauth_base': OAUTH_BASE_URL,
+            'redirect_uri': OAUTH_REDIRECT_URI,
+        },
+    )
+
+
+@app.get('/study')
+@app.get('/study/')
+async def study_session(request: Request, tutor: str | None = None):
+    tutor_name = tutor or 'Dr. Quantum'
+    return templates.TemplateResponse(
+        request,
+        'study_session.html',
+        {
+            'user': request.session.get('user'),
+            'access_token': request.session.get('access_token'),
+            'oauth_base': OAUTH_BASE_URL,
+            'redirect_uri': OAUTH_REDIRECT_URI,
+            'tutor_name': tutor_name,
+        },
+    )
+
+
+@app.get('/study-session')
+@app.get('/study-session/')
+@app.get('/study-session.html')
+async def study_session_legacy_redirect(request: Request):
+    target_url = '/study'
+    if request.url.query:
+        target_url = f'{target_url}?{request.url.query}'
+    return RedirectResponse(url=target_url, status_code=307)
 
 
 @app.get('/oauth/login')
