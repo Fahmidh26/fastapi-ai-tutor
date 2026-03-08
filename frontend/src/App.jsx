@@ -3,8 +3,11 @@ import { BrowserRouter, Navigate, Routes, Route, useLocation, useNavigate } from
 import './App.css'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8002'
+const EXPERTS_API_BASE_URL =
+  import.meta.env.VITE_EXPERTS_API_BASE_URL || import.meta.env.VITE_AISITE_OAUTH_BASE_URL || 'http://localhost:8000'
+const EXPERTS_API_URL = `${EXPERTS_API_BASE_URL.replace(/\/$/, '')}/api/experts`
 
-const TUTORS = [
+const FALLBACK_TUTORS = [
   {
     name: 'Nova',
     subtitle: 'Science Expert',
@@ -48,6 +51,34 @@ const TUTORS = [
 
 const SUBJECTS = ['All Subjects', 'Math', 'Science', 'Humanities', 'Coding']
 const PERSONALITIES = ['Socratic', 'Direct', 'Supportive']
+
+function normalizeExperts(payload) {
+  const items = Array.isArray(payload)
+    ? payload
+    : Array.isArray(payload?.experts)
+      ? payload.experts
+      : Array.isArray(payload?.data)
+        ? payload.data
+        : []
+
+  return items
+    .map((expert, index) => {
+      const fallback = FALLBACK_TUTORS[index % FALLBACK_TUTORS.length]
+      const ratingCandidate = Number(expert?.rating ?? expert?.avg_rating ?? fallback.rating)
+
+      return {
+        name: expert?.name || expert?.expert_name || fallback.name,
+        subtitle: expert?.subtitle || expert?.specialty || expert?.title || fallback.subtitle,
+        level: expert?.level || expert?.difficulty || fallback.level,
+        style: expert?.style || expert?.personality || fallback.style,
+        rating: Number.isFinite(ratingCandidate) ? ratingCandidate : fallback.rating,
+        description: expert?.description || expert?.bio || fallback.description,
+        cover: expert?.cover || expert?.cover_image || expert?.image || fallback.cover,
+        avatar: expert?.avatar || expert?.avatar_url || expert?.image || fallback.avatar,
+      }
+    })
+    .filter((expert) => Boolean(expert.name))
+}
 
 function AppShell() {
   const [loading, setLoading] = useState(true)
@@ -147,6 +178,37 @@ function AppShell() {
 function DashboardPage({ loading, session, error, startLogin, logout }) {
   const navigate = useNavigate()
   const userName = session?.user?.name || session?.user?.email || 'Guest'
+  const [tutors, setTutors] = useState(FALLBACK_TUTORS)
+  const [tutorsLoading, setTutorsLoading] = useState(true)
+  const [tutorsError, setTutorsError] = useState('')
+
+  useEffect(() => {
+    const fetchExperts = async () => {
+      try {
+        setTutorsError('')
+        const response = await fetch(EXPERTS_API_URL, {
+          headers: {
+            Accept: 'application/json',
+          },
+        })
+
+        if (!response.ok) {
+          throw new Error(`Experts request failed (${response.status})`)
+        }
+
+        const data = await response.json()
+        const normalizedExperts = normalizeExperts(data)
+        setTutors(normalizedExperts.length ? normalizedExperts : FALLBACK_TUTORS)
+      } catch (err) {
+        setTutors(FALLBACK_TUTORS)
+        setTutorsError(err instanceof Error ? err.message : 'Could not load experts API')
+      } finally {
+        setTutorsLoading(false)
+      }
+    }
+
+    fetchExperts()
+  }, [])
 
   return (
     <main className="dashboard-shell">
@@ -219,9 +281,11 @@ function DashboardPage({ loading, session, error, startLogin, logout }) {
           {!loading && !session ? (
             <p className="muted-text">Login to access session-aware study. You can still preview tutors now.</p>
           ) : null}
+          {tutorsLoading ? <p className="muted-text">Loading recommended tutors...</p> : null}
+          {tutorsError ? <p className="muted-text">Experts API unavailable, showing default tutors.</p> : null}
 
           <div className="tutor-grid">
-            {TUTORS.map((tutor) => (
+            {tutors.map((tutor) => (
               <article key={tutor.name} className="tutor-card">
                 <div className="cover" style={{ backgroundImage: `url(${tutor.cover})` }}>
                   <div className="cover-overlay" />

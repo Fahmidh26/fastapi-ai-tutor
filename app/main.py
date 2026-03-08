@@ -3,7 +3,7 @@ from __future__ import annotations
 import os
 import secrets
 from pathlib import Path
-from urllib.parse import urlencode, urlsplit
+from urllib.parse import urlencode, urljoin, urlsplit
 
 import httpx
 from dotenv import load_dotenv
@@ -30,6 +30,7 @@ OAUTH_INTERNAL_URL = os.getenv('AISITE_OAUTH_INTERNAL_URL', OAUTH_BASE_URL).rstr
 OAUTH_CLIENT_ID = os.getenv('AISITE_OAUTH_CLIENT_ID', '')
 OAUTH_CLIENT_SECRET = os.getenv('AISITE_OAUTH_CLIENT_SECRET', '')
 OAUTH_REDIRECT_URI = os.getenv('AISITE_OAUTH_REDIRECT_URI', 'http://localhost:8002/oauth/callback')
+EXPERTS_API_PATH = os.getenv('AISITE_EXPERTS_API_PATH', '/api/experts')
 FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:5173').rstrip('/')
 FRONTEND_POST_LOGIN_PATH = os.getenv('FRONTEND_POST_LOGIN_PATH', '/auth/callback')
 ALLOW_ORIGINS = [origin.strip() for origin in os.getenv('ALLOW_ORIGINS', FRONTEND_URL).split(',') if origin.strip()]
@@ -205,3 +206,39 @@ async def logout(request: Request):
 @app.get('/health')
 async def health():
     return {'ok': True}
+
+
+@app.get('/api/experts')
+async def experts(request: Request, domain: str = 'expert-chat', expert_id: int | None = None):
+    token = request.session.get('access_token')
+    if not token:
+        return JSONResponse(status_code=401, content={'error': 'Not authenticated'})
+
+    experts_url = urljoin(f'{OAUTH_INTERNAL_URL}/', EXPERTS_API_PATH.lstrip('/'))
+    params = {'domain': domain}
+    if expert_id is not None:
+        params['expert_id'] = expert_id
+
+    async with httpx.AsyncClient(timeout=15) as client:
+        experts_response = await client.get(
+            experts_url,
+            params=params,
+            headers={'Authorization': f'Bearer {token}', 'Accept': 'application/json'},
+        )
+
+    if experts_response.status_code >= 400:
+        return JSONResponse(
+            status_code=experts_response.status_code,
+            content={
+                'error': 'Failed to fetch experts',
+                'details': experts_response.text,
+            },
+        )
+
+    payload = experts_response.json()
+    experts_list = payload.get('experts', []) if isinstance(payload, dict) else payload
+    selected_expert_id = expert_id
+    if selected_expert_id is None and experts_list:
+        selected_expert_id = experts_list[0].get('id')
+
+    return {'experts': experts_list, 'expert_id': selected_expert_id, 'domain': domain}
