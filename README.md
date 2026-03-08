@@ -1,31 +1,64 @@
-# FastAPI OAuth Client (Laravel Provider)
+# FastAPI + React OAuth Client
 
-This project acts like your Laravel client app, but in FastAPI.
+FastAPI handles OAuth and session state. React handles the UI.
 
-## 1) Install
+## 1) Backend install
 
 ```powershell
-cd D:\Work\USA\new_dev_ai\fastapi-oauth-client
+cd D:\USA\fastapi-ai-tutor
 python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
-## 2) Configure
-
-- `.env` is already created with your credentials.
-- Make sure the OAuth client on the Laravel main site allows this redirect URI:
-  - `http://localhost:8002/oauth/callback`
-
-## 3) Run on port 8002
+## 2) Frontend install
 
 ```powershell
-uvicorn app.main:app --host 0.0.0.0 --port 8002 --reload
+cd D:\USA\fastapi-ai-tutor\frontend
+npm install
 ```
 
-## 4) Test flow
+## 3) Configure
 
-- Open `http://localhost:8002`
+- `.env` must include OAuth credentials (already present in your local setup).
+- OAuth provider redirect URI should be:
+  - `http://localhost:8002/oauth/callback`
+- Optional backend vars:
+  - `FRONTEND_URL=http://localhost:5173`
+  - `FRONTEND_POST_LOGIN_PATH=/auth/callback`
+  - `ALLOW_ORIGINS=http://localhost:5173`
+
+## 4) Run backend (port 8002)
+
+```powershell
+cd D:\USA\fastapi-ai-tutor
+.\.venv\Scripts\python.exe -m uvicorn app.main:app --host 0.0.0.0 --port 8002 --reload
+```
+
+## 5) Run frontend (port 5173)
+
+```powershell
+cd D:\USA\fastapi-ai-tutor\frontend
+npm run dev
+```
+
+## 6) Test flow
+
+- Open `http://localhost:5173`
 - Click **Login with Main Site**
-- Authenticate on main site
-- You should be redirected back to FastAPI and see user/token session data.
+- Authenticate on your OAuth provider
+- You will return to React, which fetches session data from FastAPI (`/api/me`)
+
+## Docker (one command for both)
+
+```powershell
+cd D:\USA\fastapi-ai-tutor
+docker compose up --build
+```
+
+- Frontend: `http://localhost:5173`
+- Backend API: `http://localhost:8002`
+- Stop services: `Ctrl + C` then `docker compose down`
+
+Notes:
+- Compose mounts your source code for hot reload.
+- Backend container uses `AISITE_OAUTH_INTERNAL_URL=http://host.docker.internal:8000/` so it can call an OAuth provider running on your host machine.

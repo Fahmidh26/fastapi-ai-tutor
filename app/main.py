@@ -8,15 +8,14 @@ from urllib.parse import urlencode, urlsplit
 import httpx
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, RedirectResponse
-from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / '.env')
 
 app = FastAPI(title='FastAPI OAuth Client')
-templates = Jinja2Templates(directory=str(BASE_DIR / 'app' / 'templates'))
 
 SESSION_SECRET_KEY = os.getenv('SESSION_SECRET_KEY', 'change-me')
 app.add_middleware(
@@ -31,6 +30,17 @@ OAUTH_INTERNAL_URL = os.getenv('AISITE_OAUTH_INTERNAL_URL', OAUTH_BASE_URL).rstr
 OAUTH_CLIENT_ID = os.getenv('AISITE_OAUTH_CLIENT_ID', '')
 OAUTH_CLIENT_SECRET = os.getenv('AISITE_OAUTH_CLIENT_SECRET', '')
 OAUTH_REDIRECT_URI = os.getenv('AISITE_OAUTH_REDIRECT_URI', 'http://localhost:8002/oauth/callback')
+FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:5173').rstrip('/')
+FRONTEND_POST_LOGIN_PATH = os.getenv('FRONTEND_POST_LOGIN_PATH', '/auth/callback')
+ALLOW_ORIGINS = [origin.strip() for origin in os.getenv('ALLOW_ORIGINS', FRONTEND_URL).split(',') if origin.strip()]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=ALLOW_ORIGINS,
+    allow_credentials=True,
+    allow_methods=['*'],
+    allow_headers=['*'],
+)
 _redirect_target = urlsplit(OAUTH_REDIRECT_URI)
 CANONICAL_HOST = _redirect_target.hostname
 CANONICAL_PORT = _redirect_target.port
@@ -54,48 +64,22 @@ async def enforce_canonical_host(request: Request, call_next):
 
 
 @app.get('/')
-async def home(request: Request):
-    return templates.TemplateResponse(
-        request,
-        'index.html',
-        {
-            'user': request.session.get('user'),
-            'access_token': request.session.get('access_token'),
-            'oauth_base': OAUTH_BASE_URL,
-            'redirect_uri': OAUTH_REDIRECT_URI,
-        },
-    )
+async def home():
+    return RedirectResponse(url=FRONTEND_URL, status_code=307)
 
 
 @app.get('/dashboard-auth')
-async def dashboard_auth(request: Request):
-    return templates.TemplateResponse(
-        request,
-        'dashboard_auth.html',
-        {
-            'user': request.session.get('user'),
-            'access_token': request.session.get('access_token'),
-            'oauth_base': OAUTH_BASE_URL,
-            'redirect_uri': OAUTH_REDIRECT_URI,
-        },
-    )
+async def dashboard_auth():
+    return RedirectResponse(url=f'{FRONTEND_URL}/dashboard-auth', status_code=307)
 
 
 @app.get('/study')
 @app.get('/study/')
-async def study_session(request: Request, tutor: str | None = None):
-    tutor_name = tutor or 'Dr. Quantum'
-    return templates.TemplateResponse(
-        request,
-        'study_session.html',
-        {
-            'user': request.session.get('user'),
-            'access_token': request.session.get('access_token'),
-            'oauth_base': OAUTH_BASE_URL,
-            'redirect_uri': OAUTH_REDIRECT_URI,
-            'tutor_name': tutor_name,
-        },
-    )
+async def study_session(request: Request):
+    target_url = f'{FRONTEND_URL}/study'
+    if request.url.query:
+        target_url = f'{target_url}?{request.url.query}'
+    return RedirectResponse(url=target_url, status_code=307)
 
 
 @app.get('/study-session')
@@ -189,9 +173,11 @@ async def oauth_callback(request: Request, code: str | None = None, state: str |
     request.session['access_token'] = access_token
     request.session['user'] = provider_user
 
-    return RedirectResponse(url='/')
+    callback_path = FRONTEND_POST_LOGIN_PATH if FRONTEND_POST_LOGIN_PATH.startswith('/') else f'/{FRONTEND_POST_LOGIN_PATH}'
+    return RedirectResponse(url=f'{FRONTEND_URL}{callback_path}')
 
 
+@app.get('/api/me')
 @app.get('/me')
 async def me(request: Request):
     user = request.session.get('user')
@@ -202,12 +188,20 @@ async def me(request: Request):
     return {'user': user, 'access_token': token}
 
 
+@app.post('/api/logout')
+@app.get('/api/logout')
+async def api_logout(request: Request):
+    request.session.clear()
+    return {'ok': True}
+
+
 @app.get('/logout')
 async def logout(request: Request):
     request.session.clear()
-    return RedirectResponse(url='/')
+    return RedirectResponse(url=FRONTEND_URL, status_code=307)
 
 
+@app.get('/api/health')
 @app.get('/health')
 async def health():
     return {'ok': True}
